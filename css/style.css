@@ -90,6 +90,9 @@ header * {
 .bg-blue-50 { background-color: #eff6ff !important; }
 .dark .bg-blue-50 { background-color: rgba(30, 58, 138, 0.3) !important; }
 
+.bg-yellow-50 { background-color: #fefce8 !important; }
+.dark .bg-yellow-50 { background-color: rgba(133, 77, 14, 0.3) !important; }
+
 /* Padroniza textos pretos/brancos */
 .text-slate-900 { color: #0f172a !important; }
 .dark .text-slate-900 { color: #f8fafc !important; }

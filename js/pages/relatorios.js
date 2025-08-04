@@ -9,7 +9,7 @@ export const RelatoriosPage = {
         
         <!-- Filtros -->
         <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md mb-6">
-            <form id="form-relatorio" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <form id="form-relatorio" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                 <div>
                     <label for="data-inicio" class="block text-sm font-medium">Data Início</label>
                     <input type="date" id="data-inicio" required 
@@ -21,10 +21,19 @@ export const RelatoriosPage = {
                         class="input-style mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md">
                 </div>
                 <div>
+                    <label for="tipo-transacao" class="block text-sm font-medium">Tipo</label>
+                    <select id="tipo-transacao" 
+                        class="input-style mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md">
+                        <option value="TODAS">Todas</option>
+                        <option value="RECEITA">Apenas Receitas</option>
+                        <option value="DESPESA">Apenas Despesas</option>
+                    </select>
+                </div>
+                <div>
                     <label for="rel-categoria" class="block text-sm font-medium">Categoria</label>
                     <select id="rel-categoria" 
                         class="input-style mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md">
-                        <option value="TODAS">Carregando...</option>
+                        <option value="TODAS">Todas as Categorias</option>
                     </select>
                 </div>
                 <button type="submit" 
@@ -47,6 +56,7 @@ export const RelatoriosPage = {
         let dadosRelatorio = null;
         const form = document.getElementById('form-relatorio');
         const catSelect = document.getElementById('rel-categoria');
+        const tipoSelect = document.getElementById('tipo-transacao');
         const resultadosEl = document.getElementById('container-resultados');
         const dataInicioEl = document.getElementById('data-inicio');
         const dataFimEl = document.getElementById('data-fim');
@@ -54,11 +64,21 @@ export const RelatoriosPage = {
 
         const popularCategorias = async () => {
             try {
-                const categorias = await categoriaService.listar();
+                const tipo = tipoSelect.value;
+                let categorias;
+                
+                if (tipo === 'TODAS') {
+                    categorias = await categoriaService.listar();
+                } else {
+                    categorias = await categoriaService.listarPorTipo(tipo);
+                }
+                
+                const categoriaAtual = catSelect.value;
                 catSelect.innerHTML = '<option value="TODAS">Todas as Categorias</option>';
+                
                 categorias.forEach(c => {
                     const icone = c.icone || '📁';
-                    catSelect.innerHTML += `<option value="${c.nome}">${icone} ${c.nome}</option>`;
+                    catSelect.innerHTML += `<option value="${c.nome}" ${c.nome === categoriaAtual ? 'selected' : ''}>${icone} ${c.nome}</option>`;
                 });
             } catch (error) {
                 console.error('Erro ao carregar categorias:', error);
@@ -66,9 +86,18 @@ export const RelatoriosPage = {
             }
         };
 
+        // Atualizar categorias quando mudar o tipo
+        tipoSelect.addEventListener('change', popularCategorias);
+
         const renderizarResultados = (transacoes) => {
             let totalReceitas = 0;
             let totalDespesas = 0;
+            
+            // Filtrar por tipo se necessário
+            const tipoFiltro = tipoSelect.value;
+            if (tipoFiltro !== 'TODAS') {
+                transacoes = transacoes.filter(t => t.tipo === tipoFiltro);
+            }
             
             let tabelaHtml = `
                 <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md overflow-x-auto" id="tabela-relatorio">
@@ -79,6 +108,7 @@ export const RelatoriosPage = {
                                 <th class="p-2">Descrição</th>
                                 <th class="p-2">Categoria</th>
                                 <th class="p-2">Tags</th>
+                                <th class="p-2">Status</th>
                                 <th class="p-2 text-right">Valor</th>
                             </tr>
                         </thead>
@@ -88,7 +118,7 @@ export const RelatoriosPage = {
             if (transacoes.length === 0) {
                 tabelaHtml += `
                     <tr>
-                        <td colspan="5" class="p-4 text-center text-slate-500">
+                        <td colspan="6" class="p-4 text-center text-slate-500">
                             Nenhum resultado encontrado.
                         </td>
                     </tr>
@@ -108,12 +138,17 @@ export const RelatoriosPage = {
                         ).join('') 
                         : '<span class="text-slate-400">-</span>';
                     
+                    const statusHtml = t.pago ? 
+                        '<span class="text-xs bg-green-600 text-white px-2 py-1 rounded">Pago</span>' : 
+                        '<span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded">Pendente</span>';
+                    
                     tabelaHtml += `
                         <tr class="border-b border-slate-200 dark:border-slate-700">
                             <td class="p-2 whitespace-nowrap">${formatDate(t.data)}</td>
                             <td class="p-2">${t.descricao}</td>
                             <td class="p-2">${t.categoria}</td>
                             <td class="p-2">${tagsHtml}</td>
+                            <td class="p-2">${statusHtml}</td>
                             <td class="p-2 text-right font-semibold ${eReceita ? 'text-green-500' : 'text-red-500'}">
                                 ${formatCurrency(t.valor)}
                             </td>
@@ -160,7 +195,8 @@ export const RelatoriosPage = {
                 saldoPeriodo,
                 dataInicio: dataInicioEl.value,
                 dataFim: dataFimEl.value,
-                categoria: catSelect.value
+                categoria: catSelect.value,
+                tipo: tipoSelect.value
             };
         };
 
@@ -169,6 +205,8 @@ export const RelatoriosPage = {
             
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             const periodo = `${formatDate(dadosRelatorio.dataInicio)} até ${formatDate(dadosRelatorio.dataFim)}`;
+            const tipoTexto = dadosRelatorio.tipo === 'TODAS' ? 'Todas as Transações' : 
+                            dadosRelatorio.tipo === 'RECEITA' ? 'Apenas Receitas' : 'Apenas Despesas';
             
             let htmlContent = `
                 <html>
@@ -189,12 +227,15 @@ export const RelatoriosPage = {
                         .valor-receita { color: #22c55e; font-weight: bold; }
                         .valor-despesa { color: #ef4444; font-weight: bold; }
                         .tag { background-color: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+                        .status-pago { background-color: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+                        .status-pendente { background-color: #eab308; color: black; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
                     </style>
                 </head>
                 <body>
                     <div class="header">
                         <h1>📊 Relatório Financeiro</h1>
                         <p><strong>Período:</strong> ${periodo}</p>
+                        <p><strong>Tipo:</strong> ${tipoTexto}</p>
                         <p><strong>Categoria:</strong> ${dadosRelatorio.categoria === 'TODAS' ? 'Todas as Categorias' : dadosRelatorio.categoria}</p>
                         <p><strong>Gerado em:</strong> ${dataAtual}</p>
                     </div>
@@ -221,6 +262,7 @@ export const RelatoriosPage = {
                                 <th>Descrição</th>
                                 <th>Categoria</th>
                                 <th>Tags</th>
+                                <th>Status</th>
                                 <th style="text-align: right;">Valor</th>
                             </tr>
                         </thead>
@@ -228,13 +270,16 @@ export const RelatoriosPage = {
             `;
             
             if (dadosRelatorio.transacoes.length === 0) {
-                htmlContent += '<tr><td colspan="5" style="text-align: center; color: #666;">Nenhuma transação encontrada</td></tr>';
+                htmlContent += '<tr><td colspan="6" style="text-align: center; color: #666;">Nenhuma transação encontrada</td></tr>';
             } else {
                 dadosRelatorio.transacoes.forEach(t => {
                     const eReceita = t.tipo === 'RECEITA';
                     const tagsText = t.tags ? 
                         t.tags.split(',').map(tag => `<span class="tag">${tag.trim()}</span>`).join('') 
                         : '-';
+                    const statusText = t.pago ? 
+                        '<span class="status-pago">Pago</span>' : 
+                        '<span class="status-pendente">Pendente</span>';
                     
                     htmlContent += `
                         <tr>
@@ -242,6 +287,7 @@ export const RelatoriosPage = {
                             <td>${t.descricao}</td>
                             <td>${t.categoria}</td>
                             <td>${tagsText}</td>
+                            <td>${statusText}</td>
                             <td style="text-align: right;" class="${eReceita ? 'valor-receita' : 'valor-despesa'}">
                                 ${formatCurrency(t.valor)}
                             </td>

@@ -1,4 +1,90 @@
-import { MainLayout } from '../components/layout.js';
+// Carregar gráfico de gastos pagos
+            const gastosPorCategoria = await transacaoService.obterGastosPorCategoria();
+            const labels = Object.keys(gastosPorCategoria);
+            const valores = Object.values(gastosPorCategoria);
+            const containerGraficoEl = document.getElementById('container-grafico');
+            
+            if (labels.length === 0) {
+                containerGraficoEl.innerHTML = '<p class="text-slate-500 text-center py-8">Sem despesas pagas para exibir.</p>';
+            } else {
+                new Chart(document.getElementById('grafico-gastos').getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: valores,
+                            backgroundColor: ['#4f46e5', '#7c3aed', '#db2777', '#f97316', '#eab308', '#22c55e'],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Carregar dados de despesas pendentes
+            const todasTransacoes = await transacaoService.listarPorMes(hoje.getFullYear(), hoje.getMonth() + 1);
+            const despesasPendentes = todasTransacoes.filter(t => t.tipo === 'DESPESA' && !t.pago);
+            const despesasPagas = todasTransacoes.filter(t => t.tipo === 'DESPESA' && t.pago);
+            
+            // Calcular despesas pendentes por categoria
+            const pendentesPorCategoria = {};
+            despesasPendentes.forEach(t => {
+                if (!pendentesPorCategoria[t.categoria]) {
+                    pendentesPorCategoria[t.categoria] = 0;
+                }
+                pendentesPorCategoria[t.categoria] += t.valor;
+            });
+            
+            // Renderizar gráfico de pendentes
+            const labelsPendentes = Object.keys(pendentesPorCategoria);
+            const valoresPendentes = Object.values(pendentesPorCategoria);
+            const containerPendentesEl = document.getElementById('container-grafico-pendentes');
+            
+            if (labelsPendentes.length === 0) {
+                containerPendentesEl.innerHTML = '<p class="text-slate-500 text-center py-8">Sem despesas pendentes.</p>';
+            } else {
+                new Chart(document.getElementById('grafico-pendentes').getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: labelsPendentes,
+                        datasets: [{
+                            data: valoresPendentes,
+                            backgroundColor: ['#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981'],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Calcular totais
+            const totalDespesasPagas = despesasPagas.reduce((sum, t) => sum + t.valor, 0);
+            const totalDespesasPendentes = despesasPendentes.reduce((sum, t) => sum + t.valor, 0);
+            const totalDespesasGeral = totalDespesasPagas + totalDespesasPendentes;
+            
+            // Atualizar resumo
+            document.getElementById('total-despesas-pagas').textContent = formatCurrency(totalDespesasPagas);
+            document.getElementById('total-despesas-pendentes').textContent = formatCurrency(totalDespesasPendentes);
+            document.getElementById('total-despesas-geral').textContent = formatCurrency(totalDespesasGeral);import { MainLayout } from '../components/layout.js';
 import { transacaoService } from '../services/transacao.js';
 import { formatCurrency } from '../utils.js';
 
@@ -32,16 +118,43 @@ export const DashboardPage = {
             </div>
         </div>
         
-        <!-- Seção de últimos lançamentos e gráfico -->
+        <!-- Seção de últimos lançamentos e gráficos -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md">
                 <h2 class="text-2xl font-bold mb-4">Últimos Lançamentos (Mês Atual)</h2>
                 <div id="ultimos-lancamentos">Carregando...</div>
             </div>
             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-bold mb-4">Gastos Pagos por Categoria (Geral)</h2>
+                <h2 class="text-2xl font-bold mb-4">Gastos Pagos por Categoria</h2>
                 <div id="container-grafico" class="mx-auto" style="max-width: 400px;">
                     <canvas id="grafico-gastos"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nova seção com gráfico de despesas pendentes -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Despesas Pendentes por Categoria</h2>
+                <div id="container-grafico-pendentes" class="mx-auto" style="max-width: 400px;">
+                    <canvas id="grafico-pendentes"></canvas>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Resumo de Despesas</h2>
+                <div id="resumo-despesas" class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                        <span class="font-medium">Despesas Pagas</span>
+                        <span id="total-despesas-pagas" class="font-bold text-green-600 dark:text-green-400">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+                        <span class="font-medium">Despesas Pendentes</span>
+                        <span id="total-despesas-pendentes" class="font-bold text-yellow-600 dark:text-yellow-400">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                        <span class="font-medium">Total de Despesas</span>
+                        <span id="total-despesas-geral" class="font-bold text-red-600 dark:text-red-400">R$ 0,00</span>
+                    </div>
                 </div>
             </div>
         </div>
