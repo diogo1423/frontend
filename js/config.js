@@ -18,4 +18,7 @@ export const authConfig = {
 export const themeConfig = {
     // Chave usada para guardar o tema no localStorage
     storageKey: 'theme'
+	
+	
+	#CORRECAO TELA INICIAL#
 };
