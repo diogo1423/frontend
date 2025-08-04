@@ -22,4 +22,3 @@ export const authConfig = {
     loginRoute: '/login',
     defaultRoute: '/dashboard'
 };
-#TESTE
