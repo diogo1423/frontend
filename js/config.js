@@ -1,20 +1,13 @@
-// Configurações globais da aplicação
+// js/config.js
+
 export const config = {
-    API_URL: 'http://localhost:8080/api',
-    DATE_FORMAT: 'pt-BR',
-    CURRENCY: 'BRL',
-    TIMEZONE: 'UTC'
+    // A URL base da sua API que está no ar no Render
+    API_URL: 'https://financeiro-api-0rsx.onrender.com/api' 
 };
 
-// Configurações de tema
-export const themeConfig = {
-    defaultTheme: 'light',
-    storageKey: 'theme'
-};
-
-// Configurações de autenticação
 export const authConfig = {
+    // Chave usada para guardar o token no localStorage do navegador
     tokenKey: 'authToken',
-    loginRoute: '/login',
-    defaultRoute: '/dashboard'
+    // Rota para onde o usuário é redirecionado ao deslogar ou ter a sessão expirada
+    loginRoute: '/login' 
 };
