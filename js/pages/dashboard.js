@@ -1,90 +1,4 @@
-// Carregar gráfico de gastos pagos
-            const gastosPorCategoria = await transacaoService.obterGastosPorCategoria();
-            const labels = Object.keys(gastosPorCategoria);
-            const valores = Object.values(gastosPorCategoria);
-            const containerGraficoEl = document.getElementById('container-grafico');
-            
-            if (labels.length === 0) {
-                containerGraficoEl.innerHTML = '<p class="text-slate-500 text-center py-8">Sem despesas pagas para exibir.</p>';
-            } else {
-                new Chart(document.getElementById('grafico-gastos').getContext('2d'), {
-                    type: 'pie',
-                    data: {
-                        labels,
-                        datasets: [{
-                            data: valores,
-                            backgroundColor: ['#4f46e5', '#7c3aed', '#db2777', '#f97316', '#eab308', '#22c55e'],
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            },
-                            title: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Carregar dados de despesas pendentes
-            const todasTransacoes = await transacaoService.listarPorMes(hoje.getFullYear(), hoje.getMonth() + 1);
-            const despesasPendentes = todasTransacoes.filter(t => t.tipo === 'DESPESA' && !t.pago);
-            const despesasPagas = todasTransacoes.filter(t => t.tipo === 'DESPESA' && t.pago);
-            
-            // Calcular despesas pendentes por categoria
-            const pendentesPorCategoria = {};
-            despesasPendentes.forEach(t => {
-                if (!pendentesPorCategoria[t.categoria]) {
-                    pendentesPorCategoria[t.categoria] = 0;
-                }
-                pendentesPorCategoria[t.categoria] += t.valor;
-            });
-            
-            // Renderizar gráfico de pendentes
-            const labelsPendentes = Object.keys(pendentesPorCategoria);
-            const valoresPendentes = Object.values(pendentesPorCategoria);
-            const containerPendentesEl = document.getElementById('container-grafico-pendentes');
-            
-            if (labelsPendentes.length === 0) {
-                containerPendentesEl.innerHTML = '<p class="text-slate-500 text-center py-8">Sem despesas pendentes.</p>';
-            } else {
-                new Chart(document.getElementById('grafico-pendentes').getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: labelsPendentes,
-                        datasets: [{
-                            data: valoresPendentes,
-                            backgroundColor: ['#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981'],
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Calcular totais
-            const totalDespesasPagas = despesasPagas.reduce((sum, t) => sum + t.valor, 0);
-            const totalDespesasPendentes = despesasPendentes.reduce((sum, t) => sum + t.valor, 0);
-            const totalDespesasGeral = totalDespesasPagas + totalDespesasPendentes;
-            
-            // Atualizar resumo
-            document.getElementById('total-despesas-pagas').textContent = formatCurrency(totalDespesasPagas);
-            document.getElementById('total-despesas-pendentes').textContent = formatCurrency(totalDespesasPendentes);
-            document.getElementById('total-despesas-geral').textContent = formatCurrency(totalDespesasGeral);import { MainLayout } from '../components/layout.js';
+import { MainLayout } from '../components/layout.js';
 import { transacaoService } from '../services/transacao.js';
 import { formatCurrency } from '../utils.js';
 
@@ -228,7 +142,7 @@ export const DashboardPage = {
                 });
             }
 
-            // Carregar gráfico
+            // Carregar gráfico de gastos pagos
             const gastosPorCategoria = await transacaoService.obterGastosPorCategoria();
             const labels = Object.keys(gastosPorCategoria);
             const valores = Object.values(gastosPorCategoria);
@@ -253,11 +167,68 @@ export const DashboardPage = {
                         plugins: {
                             legend: {
                                 position: 'top'
+                            },
+                            title: {
+                                display: false
                             }
                         }
                     }
                 });
             }
+            
+            // Carregar dados de despesas pendentes
+            const todasTransacoes = await transacaoService.listarPorMes(hoje.getFullYear(), hoje.getMonth() + 1);
+            const despesasPendentes = todasTransacoes.filter(t => t.tipo === 'DESPESA' && !t.pago);
+            const despesasPagas = todasTransacoes.filter(t => t.tipo === 'DESPESA' && t.pago);
+            
+            // Calcular despesas pendentes por categoria
+            const pendentesPorCategoria = {};
+            despesasPendentes.forEach(t => {
+                if (!pendentesPorCategoria[t.categoria]) {
+                    pendentesPorCategoria[t.categoria] = 0;
+                }
+                pendentesPorCategoria[t.categoria] += t.valor;
+            });
+            
+            // Renderizar gráfico de pendentes
+            const labelsPendentes = Object.keys(pendentesPorCategoria);
+            const valoresPendentes = Object.values(pendentesPorCategoria);
+            const containerPendentesEl = document.getElementById('container-grafico-pendentes');
+            
+            if (labelsPendentes.length === 0) {
+                containerPendentesEl.innerHTML = '<p class="text-slate-500 text-center py-8">Sem despesas pendentes.</p>';
+            } else {
+                new Chart(document.getElementById('grafico-pendentes').getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: labelsPendentes,
+                        datasets: [{
+                            data: valoresPendentes,
+                            backgroundColor: ['#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981'],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Calcular totais
+            const totalDespesasPagas = despesasPagas.reduce((sum, t) => sum + t.valor, 0);
+            const totalDespesasPendentes = despesasPendentes.reduce((sum, t) => sum + t.valor, 0);
+            const totalDespesasGeral = totalDespesasPagas + totalDespesasPendentes;
+            
+            // Atualizar resumo
+            document.getElementById('total-despesas-pagas').textContent = formatCurrency(totalDespesasPagas);
+            document.getElementById('total-despesas-pendentes').textContent = formatCurrency(totalDespesasPendentes);
+            document.getElementById('total-despesas-geral').textContent = formatCurrency(totalDespesasGeral);
             
         } catch (error) {
             console.error('Erro ao carregar dashboard:', error);
