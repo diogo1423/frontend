@@ -151,22 +151,14 @@ export const RegisterPage = {
                 const data = await response.json();
                 
                 if (response.ok) {
-                    alert(data.message || 'Cadastro realizado com sucesso! Verifique seu e-mail.');
+                    alert(data.message || 'Cadastro realizado com sucesso! Você já pode fazer login.');
                     window.location.hash = '#/login';
                 } else {
-                    // SE A RESPOSTA NÃO FOR OK, IMPRIME O ERRO DETALHADO NO CONSOLE
-                    console.error("DEBUG: Resposta completa de erro do servidor:", data);
-                    
-                    let errorMessage = data.message || "Erro desconhecido no cadastro.";
-                    if (data.errors && Array.isArray(data.errors)) {
-                        errorMessage = data.errors.map(err => err.defaultMessage).join(', ');
-                    }
-
-                    throw new Error(errorMessage);
+                    throw new Error(data.message || 'Erro ao cadastrar');
                 }
             } catch (error) {
                 console.error('Erro ao cadastrar:', error);
-                alert(`Erro: ${error.message}`);
+                alert(error.message);
             }
         });
     }
