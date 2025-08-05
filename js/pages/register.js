@@ -56,4 +56,5 @@ form.addEventListener('submit', async (e) => {
         console.error('Erro ao cadastrar:', error);
         alert(error.message);
     }
+	//
 });
