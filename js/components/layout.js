@@ -7,16 +7,16 @@ export const MainLayout = (pageContent) => `
                 <h1 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">💰 Financeiro</h1>
             </div>
             <nav class="flex-1 px-4 py-4 space-y-2">
-                <a href="#/dashboard" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md">
+                <a href="#/dashboard" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                     📊 Dashboard
                 </a>
-                <a href="#/lancamentos" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md">
+                <a href="#/lancamentos" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                     💸 Lançamentos
                 </a>
-                <a href="#/categorias" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md">
+                <a href="#/categorias" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                     📁 Categorias
                 </a>
-                <a href="#/relatorios" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md">
+                <a href="#/relatorios" class="flex items-center px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                     📈 Relatórios
                 </a>
             </nav>

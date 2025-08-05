@@ -86,6 +86,40 @@ html:not(.dark) body {
     background-color: #475569 !important;
 }
 
+/* Cores para hover no menu lateral */
+.hover\:bg-slate-100:hover {
+    background-color: #f1f5f9 !important;
+}
+
+.dark .hover\:bg-slate-100:hover {
+    background-color: transparent !important;
+}
+
+/* Botão limpar filtros */
+.bg-slate-100 {
+    background-color: #f1f5f9 !important;
+}
+
+.dark .bg-slate-100 {
+    background-color: #475569 !important;
+}
+
+.hover\:bg-slate-200:hover {
+    background-color: #e2e8f0 !important;
+}
+
+.dark .hover\:bg-slate-200:hover {
+    background-color: #64748b !important;
+}
+
+.text-slate-800 {
+    color: #1e293b !important;
+}
+
+.dark .text-slate-800 {
+    color: #e2e8f0 !important;
+}
+
 #theme-toggle-dark-icon.hidden,
 #theme-toggle-light-icon.hidden {
     display: none !important;

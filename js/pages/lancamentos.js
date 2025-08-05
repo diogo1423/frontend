@@ -101,7 +101,7 @@ export const LancamentosPage = {
                                 <input type="number" id="filtro-valor-max" step="0.01" placeholder="R$ 999,99" class="input-style w-full px-2 py-1 text-sm bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded">
                             </div>
                             <div class="flex items-end">
-                                <button id="limpar-filtros" class="w-full px-3 py-1 text-sm bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">Limpar Filtros</button>
+                                <button id="limpar-filtros" class="w-full px-3 py-1 text-sm bg-slate-100 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded hover:bg-slate-200 dark:hover:bg-slate-500 transition-colors">Limpar Filtros</button>
                             </div>
                         </div>
                     </div>
