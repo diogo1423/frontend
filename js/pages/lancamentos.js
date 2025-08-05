@@ -73,17 +73,17 @@ export const LancamentosPage = {
                     <div class="mb-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
-                                <label for="filtro-busca" class="block text-xs font-medium mb-1">Buscar por descrição</label>
+                                <label for="filtro-busca" class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300">Buscar por descrição</label>
                                 <input type="text" id="filtro-busca" placeholder="Digite para buscar..." class="input-style w-full px-2 py-1 text-sm bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded">
                             </div>
                             <div>
-                                <label for="filtro-categoria" class="block text-xs font-medium mb-1">Filtrar por categoria</label>
+                                <label for="filtro-categoria" class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300">Filtrar por categoria</label>
                                 <select id="filtro-categoria" class="input-style w-full px-2 py-1 text-sm bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded">
                                     <option value="">Todas as categorias</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="filtro-status" class="block text-xs font-medium mb-1">Status</label>
+                                <label for="filtro-status" class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300">Status</label>
                                 <select id="filtro-status" class="input-style w-full px-2 py-1 text-sm bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded">
                                     <option value="">Todos</option>
                                     <option value="pago">Pago</option>
@@ -93,15 +93,15 @@ export const LancamentosPage = {
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                             <div>
-                                <label for="filtro-valor-min" class="block text-xs font-medium mb-1">Valor mínimo</label>
+                                <label for="filtro-valor-min" class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300">Valor mínimo</label>
                                 <input type="number" id="filtro-valor-min" step="0.01" placeholder="R$ 0,00" class="input-style w-full px-2 py-1 text-sm bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded">
                             </div>
                             <div>
-                                <label for="filtro-valor-max" class="block text-xs font-medium mb-1">Valor máximo</label>
+                                <label for="filtro-valor-max" class="block text-xs font-medium mb-1 text-slate-700 dark:text-slate-300">Valor máximo</label>
                                 <input type="number" id="filtro-valor-max" step="0.01" placeholder="R$ 999,99" class="input-style w-full px-2 py-1 text-sm bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded">
                             </div>
                             <div class="flex items-end">
-                                <button id="limpar-filtros" class="w-full px-3 py-1 text-sm bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-500">Limpar Filtros</button>
+                                <button id="limpar-filtros" class="w-full px-3 py-1 text-sm bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">Limpar Filtros</button>
                             </div>
                         </div>
                     </div>

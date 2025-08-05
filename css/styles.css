@@ -66,12 +66,24 @@ html:not(.dark) body {
     background: transparent !important;
 }
 
-/* Remove sombras de qualquer elemento dentro do header */
-header * {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    filter: none !important;
-    drop-shadow: none !important;
+/* Estilos para botões de ícone selecionados */
+.icone-btn.bg-indigo-500 {
+    background-color: #6366f1 !important;
+    color: white !important;
+}
+
+.dark .icone-btn.bg-indigo-500 {
+    background-color: #4f46e5 !important;
+    color: white !important;
+}
+
+/* Garantir visibilidade de texto em campos de filtro */
+.bg-slate-50 {
+    background-color: #f8fafc !important;
+}
+
+.dark .bg-slate-50 {
+    background-color: #475569 !important;
 }
 
 #theme-toggle-dark-icon.hidden,
