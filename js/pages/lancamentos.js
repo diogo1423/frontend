@@ -395,7 +395,7 @@ export const LancamentosPage = {
             aplicarFiltros();
         });
         
-        // Event listener para lista de lançamentos
+        /// Event listener para lista de lançamentos
         listaEl.addEventListener('click', async (e) => {
             // Alternar status pago/pendente
             const statusBtn = e.target.closest('span[data-id]');
