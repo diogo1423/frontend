@@ -52,6 +52,37 @@ export const LancamentosPage = {
                             <label for="num-parcelas" class="block text-sm font-medium">Nº de Parcelas</label>
                             <input type="number" id="num-parcelas" value="2" min="2" class="input-style mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md">
                         </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="recorrente" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            <label for="recorrente" class="ml-2 block text-sm">É despesa recorrente?</label>
+                        </div>
+                        <div id="campo-recorrencia" class="hidden space-y-3">
+                            <div>
+                                <label for="frequencia" class="block text-sm font-medium">Frequência</label>
+                                <select id="frequencia" class="input-style mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md">
+                                    <option value="MENSAL">Mensal</option>
+                                    <option value="SEMANAL">Semanal</option>
+                                    <option value="QUINZENAL">Quinzenal</option>
+                                    <option value="BIMESTRAL">Bimestral</option>
+                                    <option value="TRIMESTRAL">Trimestral</option>
+                                    <option value="SEMESTRAL">Semestral</option>
+                                    <option value="ANUAL">Anual</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="duracao-recorrencia" class="block text-sm font-medium">Por quanto tempo?</label>
+                                <select id="duracao-recorrencia" class="input-style mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md">
+                                    <option value="3">3 meses</option>
+                                    <option value="6">6 meses</option>
+                                    <option value="12">1 ano</option>
+                                    <option value="24">2 anos</option>
+                                    <option value="36">3 anos</option>
+                                    <option value="60">5 anos</option>
+                                    <option value="0">Indeterminado</option>
+                                </select>
+                            </div>
+                        </div>
                         <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700">Lançar</button>
                     </form>
                 </div>
@@ -236,6 +267,19 @@ export const LancamentosPage = {
         // Event listener para parcelas
         document.getElementById('parcelado').addEventListener('change', (e) => {
             document.getElementById('campo-parcelas').classList.toggle('hidden', !e.target.checked);
+            if (e.target.checked) {
+                document.getElementById('recorrente').checked = false;
+                document.getElementById('campo-recorrencia').classList.add('hidden');
+            }
+        });
+        
+        // Event listener para recorrência
+        document.getElementById('recorrente').addEventListener('change', (e) => {
+            document.getElementById('campo-recorrencia').classList.toggle('hidden', !e.target.checked);
+            if (e.target.checked) {
+                document.getElementById('parcelado').checked = false;
+                document.getElementById('campo-parcelas').classList.add('hidden');
+            }
         });
         
         // Submissão do formulário
@@ -243,6 +287,7 @@ export const LancamentosPage = {
             e.preventDefault();
             try {
                 const isParcelado = document.getElementById('parcelado').checked;
+                const isRecorrente = document.getElementById('recorrente').checked;
                 const tags = document.getElementById('tags').value;
                 
                 const lancamento = {
@@ -256,9 +301,77 @@ export const LancamentosPage = {
                     numeroParcelas: isParcelado ? parseInt(document.getElementById('num-parcelas').value) : null
                 };
                 
-                await transacaoService.criar(lancamento);
+                if (isRecorrente) {
+                    // Criar múltiplas transações para despesa recorrente
+                    const frequencia = document.getElementById('frequencia').value;
+                    const duracao = parseInt(document.getElementById('duracao-recorrencia').value);
+                    const dataInicial = new Date(lancamento.data);
+                    
+                    // Calcular número de vezes baseado na frequência
+                    let numeroVezes = 0;
+                    let incremento = { meses: 0, dias: 0 };
+                    
+                    switch (frequencia) {
+                        case 'SEMANAL':
+                            incremento.dias = 7;
+                            numeroVezes = duracao > 0 ? Math.floor((duracao * 30) / 7) : 52;
+                            break;
+                        case 'QUINZENAL':
+                            incremento.dias = 15;
+                            numeroVezes = duracao > 0 ? Math.floor((duracao * 30) / 15) : 24;
+                            break;
+                        case 'MENSAL':
+                            incremento.meses = 1;
+                            numeroVezes = duracao > 0 ? duracao : 12;
+                            break;
+                        case 'BIMESTRAL':
+                            incremento.meses = 2;
+                            numeroVezes = duracao > 0 ? Math.floor(duracao / 2) : 6;
+                            break;
+                        case 'TRIMESTRAL':
+                            incremento.meses = 3;
+                            numeroVezes = duracao > 0 ? Math.floor(duracao / 3) : 4;
+                            break;
+                        case 'SEMESTRAL':
+                            incremento.meses = 6;
+                            numeroVezes = duracao > 0 ? Math.floor(duracao / 6) : 2;
+                            break;
+                        case 'ANUAL':
+                            incremento.meses = 12;
+                            numeroVezes = duracao > 0 ? Math.floor(duracao / 12) : 1;
+                            break;
+                    }
+                    
+                    // Criar as transações recorrentes
+                    for (let i = 0; i < numeroVezes; i++) {
+                        const dataTransacao = new Date(dataInicial);
+                        
+                        if (incremento.meses > 0) {
+                            dataTransacao.setMonth(dataTransacao.getMonth() + (i * incremento.meses));
+                        } else {
+                            dataTransacao.setDate(dataTransacao.getDate() + (i * incremento.dias));
+                        }
+                        
+                        const lancamentoRecorrente = {
+                            ...lancamento,
+                            descricao: `${lancamento.descricao} (${i + 1}/${numeroVezes})`,
+                            data: dataTransacao.toISOString().split('T')[0],
+                            parcelado: false,
+                            numeroParcelas: null
+                        };
+                        
+                        await transacaoService.criar(lancamentoRecorrente);
+                    }
+                    
+                    alert(`${numeroVezes} lançamentos recorrentes criados com sucesso!`);
+                } else {
+                    // Criar lançamento normal ou parcelado
+                    await transacaoService.criar(lancamento);
+                }
+                
                 form.reset();
                 document.getElementById('campo-parcelas').classList.add('hidden');
+                document.getElementById('campo-recorrencia').classList.add('hidden');
                 await renderizarLancamentos();
             } catch (error) {
                 console.error('Erro ao salvar lançamento:', error);
